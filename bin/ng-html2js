@@ -45,17 +45,34 @@ var baseDir = argv.b;
 // Main script
 //
 
-var content = fs.readFileSync(inputFile, 'utf8');
-var inputAlias = inputFile;
-if(baseDir){
-  baseDir = path.resolve(baseDir);
-  inputAlias = inputAlias.replace(baseDir, '');
-}
-inputAlias = inputAlias.replace(/\\/g, '/');
-var output = html2js(inputAlias, content, moduleName, moduleVar);
-
 if (outputFile) {
-  fs.writeFileSync(outputFile, output, 'utf8');
+    fs.writeFileSync(outputFile, '', 'utf8');
+}
+
+if (fs.statSync(inputFile).isDirectory()) {
+    require('readdirp')({ root: inputFile, fileFilter: '*.html' })
+        .on('error', function (err) { console.error('fatal error', err); })
+        .on('data', function(entry){
+            convertFile(entry.fullPath);
+        });
 } else {
-  console.log(output);
+    convertFile(inputFile);
+}
+
+
+function convertFile(inputFile) {
+    var content = fs.readFileSync(inputFile, 'utf8');
+    var inputAlias = inputFile;
+    if (baseDir) {
+        baseDir = path.resolve(baseDir);
+        inputAlias = inputAlias.replace(baseDir, '');
+    }
+    inputAlias = inputAlias.replace(/\\/g, '/');
+    var output = html2js(inputAlias, content, moduleName, moduleVar);
+
+    if (outputFile) {
+        fs.appendFile(outputFile, output, 'utf8');
+    } else {
+        console.log(output);
+    }
 }
