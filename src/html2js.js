@@ -19,6 +19,7 @@ var util = require('util');
 
 var TMPL = fs.readFileSync(path.join(__dirname, './template.tmpl'), 'utf-8');
 var SINGLE_MODULE_TMPL = fs.readFileSync(path.join(__dirname, './singleModule.tmpl'), 'utf-8');
+var SINGLE_MODULE_HDR_TMPL = fs.readFileSync(path.join(__dirname, './singleModuleHeader.tmpl'), 'utf-8');
 
 
 //
@@ -34,18 +35,19 @@ var escapeContent = function(content) {
 // Main script
 //
 
-module.exports = function (fileName, content, moduleName, moduleVar) {
+module.exports = function (fileName, content, moduleName, moduleVar, skipHeader) {
   var escapedContent = escapeContent(content);
 
-  var output = null;
+  var output = '';
   moduleVar = moduleVar || 'module';
   if (moduleName) {
-    output = util.format(SINGLE_MODULE_TMPL,
-        moduleVar,
-        moduleVar, moduleName,
-        moduleVar, moduleName,
-        moduleVar,
-        fileName, escapedContent);
+      if (!skipHeader) {
+          output += util.format(SINGLE_MODULE_HDR_TMPL,
+              moduleVar,
+              moduleVar, moduleName,
+              moduleVar, moduleName);
+      }
+      output += util.format(SINGLE_MODULE_TMPL, moduleVar, fileName, escapedContent);
   } else {
     output = util.format(TMPL, moduleVar, fileName, moduleVar, fileName, escapedContent);
   }

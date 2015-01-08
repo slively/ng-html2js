@@ -72,7 +72,7 @@ if (fs.statSync(fullPath).isDirectory()) {
     convertFile(inputFile);
 }
 
-
+var skipHeader = false;
 function convertFile(inputFile) {
     var content = fs.readFileSync(inputFile, 'utf8');
     var inputAlias = inputFile;
@@ -80,11 +80,12 @@ function convertFile(inputFile) {
         inputAlias = inputAlias.replace(baseDir, '');
     }
     inputAlias = inputAlias.replace(/\\/g, '/');
-    var output = html2js(inputAlias, content, moduleName, moduleVar);
+    var output = html2js(inputAlias, content, moduleName, moduleVar, skipHeader);
 
     if (outputFile) {
         fs.appendFile(outputFile, output, 'utf8');
     } else {
         console.log(output);
     }
+    skipHeader = true; //only the first file needs a header
 }

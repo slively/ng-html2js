@@ -1,10 +1,3 @@
-var %s;
-try {
-  %s = angular.module('%s');
-} catch (e) {
-  %s = angular.module('%s', []);
-}
-
 %s.run(['$templateCache', function ($templateCache) {
   $templateCache.put('%s',
     '%s');
