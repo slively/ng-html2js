@@ -41,6 +41,11 @@ var moduleName = argv.m;
 var moduleVar = argv['module-var'];
 var baseDir = argv.b;
 
+if (baseDir) {
+    baseDir = path.resolve(baseDir);
+}
+
+var fullPath = path.join(baseDir, inputFile);
 //
 // Main script
 //
@@ -49,8 +54,8 @@ if (outputFile) {
     fs.writeFileSync(outputFile, '', 'utf8');
 }
 
-if (fs.statSync(inputFile).isDirectory()) {
-    require('readdirp')({ root: inputFile, fileFilter: '*.html' })
+if (fs.statSync(fullPath).isDirectory()) {
+    require('readdirp')({ root: fullPath, fileFilter: '*.html' })
         .on('error', function (err) { console.error('fatal error', err); })
         .on('data', function(entry){
             convertFile(entry.fullPath);
@@ -64,7 +69,6 @@ function convertFile(inputFile) {
     var content = fs.readFileSync(inputFile, 'utf8');
     var inputAlias = inputFile;
     if (baseDir) {
-        baseDir = path.resolve(baseDir);
         inputAlias = inputAlias.replace(baseDir, '');
     }
     inputAlias = inputAlias.replace(/\\/g, '/');
