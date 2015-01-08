@@ -24,6 +24,10 @@ var argv = optimist.usage('Usage: $0 <input file> <output file>')
     .alias('b', 'basedir')
     .string('b')
     .describe('b', 'If basedir is provided, basedir will be removed from the templates\' path.')
+    // -a, --append option
+    .alias('a', 'append')
+    .boolean('a')
+    .describe('a', 'If output file is provided, this flag will set nh-html2js to append to the file instead of replacing.')
     // -h, --help option
     .alias('h', 'help')
     .boolean('h')
@@ -40,6 +44,7 @@ var outputFile = argv._[1];
 var moduleName = argv.m;
 var moduleVar = argv['module-var'];
 var baseDir = argv.b;
+var append = argv.a;
 
 if (baseDir) {
     baseDir = path.resolve(baseDir);
@@ -51,7 +56,10 @@ var fullPath = path.join(baseDir, inputFile);
 //
 
 if (outputFile) {
-    fs.writeFileSync(outputFile, '', 'utf8');
+    var outputFileExists = fs.existsSync(outputFile);
+    if (!outputFileExists || (outputFileExists && !append)) {
+        fs.writeFileSync(outputFile, '', 'utf8');
+    }
 }
 
 if (fs.statSync(fullPath).isDirectory()) {
